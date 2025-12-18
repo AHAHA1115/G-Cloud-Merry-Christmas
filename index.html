@@ -2,15 +2,33 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>The Christmas Gift to You</title>
+    
     <style>
-        body { margin: 0; overflow: hidden; background-color: #000000; font-family: 'Times New Roman', serif; }
-        #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #000000; 
+            font-family: 'Times New Roman', serif; 
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #canvas-container { 
+            width: 100%; 
+            height: 100vh; 
+            height: 100dvh; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            z-index: 1; 
+        }
 
         /* UI Overlay */
         #ui-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100dvh;
             z-index: 10; pointer-events: none;
             display: flex; flex-direction: column;
             align-items: center;
@@ -21,7 +39,7 @@
 
         /* Loading */
         #loader {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100dvh;
             background: #000; z-index: 100;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.8s ease-out;
@@ -39,32 +57,35 @@
 
         /* Typography */
         h1 {
-            color: #fceea7; font-size: 56px; margin: 0; font-weight: 400;
-            letter-spacing: 6px;
+            color: #fceea7; font-size: 36px; margin: 0; font-weight: 400;
+            letter-spacing: 3px;
             text-shadow: 0 0 50px rgba(252, 238, 167, 0.6);
             background: linear-gradient(to bottom, #fff, #eebb66);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             font-family: 'Cinzel', 'Times New Roman', serif;
             opacity: 0.9;
-            transition: opacity 0.5s ease;
+            text-align: center;
+            padding: 0 10px;
         }
+        @media (min-width: 768px) { h1 { font-size: 56px; letter-spacing: 6px; } }
 
         /* Buttons & Controls */
         .upload-container {
-            display: flex; gap: 15px; margin-top: 20px; pointer-events: auto;
+            display: flex; gap: 10px; margin-top: 20px; pointer-events: auto;
             text-align: center; transition: opacity 0.5s ease;
         }
         .upload-btn {
             background: rgba(20, 20, 20, 0.6);
             border: 1px solid rgba(212, 175, 55, 0.4);
-            color: #d4af37; padding: 10px 25px; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 3px; font-size: 10px;
-            transition: all 0.4s; display: inline-block; backdrop-filter: blur(5px);
+            color: #d4af37; padding: 8px 15px; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 2px; font-size: 10px;
+            transition: all 0.4s; display: inline-block; 
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
         }
-        .upload-btn:hover { background: #d4af37; color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+        .upload-btn:hover { background: #d4af37; color: #000; }
         .hint-text {
             color: rgba(212, 175, 55, 0.5); font-size: 9px; margin-top: 8px;
-            letter-spacing: 1px; text-transform: uppercase;
+            letter-spacing: 1px; text-transform: uppercase; text-align: center;
         }
 
         /* Music Controls */
@@ -76,35 +97,54 @@
             width: 40px; height: 40px; border-radius: 50%;
             border: 1px solid rgba(212, 175, 55, 0.4); background: rgba(20, 20, 20, 0.6);
             color: #d4af37; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(5px); transition: all 0.4s;
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
         }
-        .music-btn:hover { background: #d4af37; color: #000; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5); }
 
         /* Volume */
         .volume-control {
-            pointer-events: auto; margin-top: 10px; width: 150px; height: 2px;
-            background: rgba(212, 175, 55, 0.2); position: relative; cursor: pointer;
-            transition: opacity 0.5s ease;
+            pointer-events: auto; margin-top: 15px; width: 150px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; cursor: pointer;
+        }
+        .volume-bg {
+            width: 100%; height: 2px; background: rgba(212, 175, 55, 0.2); position: absolute;
         }
         .volume-slider {
-            position: absolute; top: 0; left: 0; height: 100%; width: 70%;
+            position: absolute; left: 0; height: 2px; width: 70%;
             background: #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
+            pointer-events: none;
         }
         .volume-handle {
-            position: absolute; top: 50%; left: 70%; transform: translate(-50%, -50%);
-            width: 10px; height: 10px; border-radius: 50%; background: #d4af37;
+            position: absolute; left: 70%; width: 14px; height: 14px; 
+            border-radius: 50%; background: #d4af37; margin-left: -7px;
             box-shadow: 0 0 8px rgba(212, 175, 55, 0.8);
+            pointer-events: none;
         }
 
         #file-input, #music-input { display: none; }
 
+        /* 
+           ★ 关键修改 ★
+           将摄像头包裹层移到左上角，大小设为 1px，
+           z-index 设为 -100 放在所有层级最下方，
+           opacity 设为 0 完全透明。
+           这样 Safari 认为它在渲染，但用户完全看不到。
+        */
         #webcam-wrapper {
-            position: absolute; bottom: 40px; right: 40px; width: 10px; height: 10px;
-            opacity: 0; pointer-events: none; overflow: hidden;
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 1px; 
+            height: 1px;
+            opacity: 0; 
+            pointer-events: none; 
+            overflow: hidden;
+            z-index: -100; 
         }
+        #webcam-preview { width: 100%; height: 100%; object-fit: cover; }
     </style>
 
-    <style>@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');</style>
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
 
     <script type="importmap">
         {
@@ -132,7 +172,7 @@
             <label class="upload-btn">Add Memories <input type="file" id="file-input" multiple accept="image/*"></label>
         </div>
         <div class="upload-wrapper">
-            <label class="upload-btn">Add Music <input type="file" id="music-input" accept="audio/mp3"></label>
+            <label class="upload-btn">Add Music <input type="file" id="music-input" accept="audio/*"></label>
         </div>
     </div>
     <div class="music-controls">
@@ -140,14 +180,19 @@
         <button class="music-btn" id="restart-btn">🔄</button>
     </div>
     <div class="volume-control" id="volume-control">
+        <div class="volume-bg"></div>
         <div class="volume-slider" id="volume-slider"></div>
         <div class="volume-handle" id="volume-handle"></div>
     </div>
-    <div class="hint-text">Gesture: '✌️' for Fireworks | '☝️' for Letter | '👌' for Photo</div>
+    <div class="hint-text">
+        Gestures:<br>
+        ✌️ Fireworks | ☝️ Letter | 👌 Photo<br>
+        (Allow Camera Access)
+    </div>
 </div>
 
 <div id="webcam-wrapper">
-    <video id="webcam" autoplay playsinline style="display:none;"></video>
+    <video id="webcam" playsinline webkit-playsinline muted style="display:none;"></video>
     <canvas id="webcam-preview"></canvas>
 </div>
 
@@ -161,15 +206,11 @@
     import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     import { FilesetResolver, HandLandmarker } from '@mediapipe/tasks-vision';
 
-    // ==========================================
-    // ⚙️ 配置区域
-    // ==========================================
     const ASSETS = {
         music: "/G-Cloud-Merry-Christmas/music.mp3",
         images: ["/G-Cloud-Merry-Christmas/photo1.jpg",
-                 "/G-Cloud-Merry-Christmas/photo2.jpg",
-                 "/G-Cloud-Merry-Christmas/photo3.jpg"
-                ]
+                 "/G-Cloud-Merry-Christmas/photo2.jpg"，
+                 "/G-Cloud-Merry-Christmas/photo3.jpg"]
     };
 
     const CONFIG = {
@@ -178,44 +219,22 @@
             champagneGold: 0xffd966,
             deepGreen: 0x03180a,
             accentRed: 0x990000,
-            fireworkSilver: [
-            0xffffff, // 爆心白
-            0xe6e6e6, // 高亮银
-            0xbfbfbf, // 中银
-            0x808080  // 衰减灰
-        ],
-            fireworkGold: [
-            0xfff6cc, // 爆心暖白
-            0xffd700, // 亮金
-            0xffb700, // 深金
-            0xcc8a00  // 暗金衰减
-        ],
-            fireworkOrange: [
-            0xfff0cc, // 爆心浅白橙
-            0xffa500, // 亮橙
-            0xff7a00, // 深橙
-            0xcc5500  // 暗橙衰减
-        ],            
-            fireworkRed: [
-            0xffe6e6, // 爆心浅白红
-            0xff3333, // 亮红
-            0xcc0000, // 深红
-            0x660000  // 暗红衰减
-        ]
+            fireworkSilver: [0xffffff, 0xe6e6e6, 0xbfbfbf, 0x808080],
+            fireworkGold: [0xfff6cc, 0xffd700, 0xffb700, 0xcc8a00],
+            fireworkOrange: [0xfff0cc, 0xffa500, 0xff7a00, 0xcc5500],            
+            fireworkRed: [0xffe6e6, 0xff3333, 0xcc0000, 0x660000]
         },
         particles: { count: 1800, dustCount: 2500, treeHeight: 24, treeRadius: 8 },
         camera: { z: 50 },
         text: { string: "Merry Christmas", size: 10 },
-        // 💌 书信内容配置
         letter: {
             title: "To My Dearest Friend",
-            // 使用 \n 换行
             content: "Merry Christmas!\n May you become extremely wealthy and beautiful in the new year!\n\n愿:圣诞温馨快乐，\n新的一年升职加薪，心想事成。\n\nBest Wishes,\nWY,\n2025.12.17"
         }
     };
 
     const STATE = {
-        mode: 'TREE', // TREE, SCATTER, FOCUS, TEXT, LETTER
+        mode: 'TREE',
         focusTarget: null,
         hand: { detected: false, x: 0, y: 0 },
         rotation: { x: 0, y: 0, targetX: 0, targetY: 0 },
@@ -224,7 +243,7 @@
 
     let scene, camera, renderer, composer;
     let mainGroup, fireworkGroup;
-    let letterMesh; // 信件网格
+    let letterMesh;
     let clock = new THREE.Clock();
     let particleSystem = [];
     let fireworks = [];
@@ -232,6 +251,7 @@
     let handLandmarker, video, webcamCanvas, webcamCtx;
     let caneTexture, stockingTexture, particleTexture, giftTexture;
     let textPoints = [];
+    let running = false;
 
     async function init() {
         initThree();
@@ -243,23 +263,29 @@
         createHighQualityTextures();
         createParticles();
         createDust();
-        createLetter(); // 创建信件
+        createLetter();
 
         loadConfiguredImages();
 
         setupPostProcessing();
         setupEvents();
         initMusicPlayer();
-        await initMediaPipe();
+        
+        try {
+            console.log("Initializing MediaPipe...");
+            await initMediaPipe();
+        } catch (e) {
+            console.error("Hand tracking failed:", e);
+        }
 
         const loader = document.getElementById('loader');
         loader.style.opacity = 0;
         setTimeout(() => loader.remove(), 800);
 
+        running = true;
         animate();
     }
 
-    // --- 字体生成 ---
     function generateTextPoints(text) {
         return new Promise((resolve) => {
             const canvas = document.createElement('canvas');
@@ -342,7 +368,6 @@
     }
 
     function createHighQualityTextures() {
-        // Cane Texture
         const canvas = document.createElement('canvas');
         canvas.width = 512; canvas.height = 512;
         const ctx = canvas.getContext('2d');
@@ -357,7 +382,6 @@
         caneTexture.wrapS = THREE.RepeatWrapping; caneTexture.wrapT = THREE.RepeatWrapping;
         caneTexture.repeat.set(2, 2);
 
-        // Stocking Texture
         const sCanvas = document.createElement('canvas'); sCanvas.width=512; sCanvas.height=512;
         const sCtx = sCanvas.getContext('2d');
         sCtx.fillStyle = '#990000'; sCtx.fillRect(0,0,512,512);
@@ -366,7 +390,6 @@
         sCtx.fillStyle = '#eeeeee'; sCtx.fillRect(0,0,512,128);
         stockingTexture = new THREE.CanvasTexture(sCanvas);
 
-        // Particle Glow Texture
         const pCanvas = document.createElement('canvas');
         pCanvas.width = 64; pCanvas.height = 64;
         const pCtx = pCanvas.getContext('2d');
@@ -378,59 +401,43 @@
         pCtx.fillRect(0,0,64,64);
         particleTexture = new THREE.CanvasTexture(pCanvas);
 
-        // 🎁 Gift Box Texture (High End Green + Red Ribbon)
         const gCanvas = document.createElement('canvas');
         gCanvas.width = 512; gCanvas.height = 512;
         const gCtx = gCanvas.getContext('2d');
-
-        // Background - Deep Luxury Green
         gCtx.fillStyle = '#0b3d18';
         gCtx.fillRect(0, 0, 512, 512);
-
-        // Add subtle noise for texture
         for(let i=0; i<5000; i++) {
             gCtx.fillStyle = Math.random() > 0.5 ? '#104920' : '#053010';
             gCtx.fillRect(Math.random()*512, Math.random()*512, 2, 2);
         }
-
-        // Red Ribbons (Cross)
-        gCtx.fillStyle = '#8B0000'; // Dark Red
+        gCtx.fillStyle = '#8B0000'; 
         const ribbonWidth = 80;
-        // Vertical ribbon
         gCtx.fillRect((512-ribbonWidth)/2, 0, ribbonWidth, 512);
-        // Horizontal ribbon
         gCtx.fillRect(0, (512-ribbonWidth)/2, 512, ribbonWidth);
-
-        // Gold Trim on ribbon edges (optional details for high-end feel)
-        gCtx.fillStyle = '#D4AF37'; // Gold
+        gCtx.fillStyle = '#D4AF37'; 
         gCtx.fillRect((512-ribbonWidth)/2 - 2, 0, 2, 512);
         gCtx.fillRect((512+ribbonWidth)/2, 0, 2, 512);
         gCtx.fillRect(0, (512-ribbonWidth)/2 - 2, 512, 2);
         gCtx.fillRect(0, (512+ribbonWidth)/2, 512, 2);
-
         giftTexture = new THREE.CanvasTexture(gCanvas);
         giftTexture.colorSpace = THREE.SRGBColorSpace;
     }
 
-    // 💌 创建书信 - 修改：尺寸更大，始终置顶
     function createLetter() {
         const width = 1024;
-        const height = 1448; // A4 比例
+        const height = 1448; 
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext('2d');
 
-        // 1. 牛皮纸背景
-        ctx.fillStyle = '#d2b48c'; // Kraft color
+        ctx.fillStyle = '#d2b48c'; 
         ctx.fillRect(0, 0, width, height);
 
-        // 添加杂色质感
         for(let i=0; i<50000; i++) {
             ctx.fillStyle = Math.random() > 0.5 ? '#c2a47c' : '#e2c49c';
             ctx.fillRect(Math.random()*width, Math.random()*height, 2, 2);
         }
 
-        // 2. 边框装饰
         ctx.strokeStyle = '#8B0000';
         ctx.lineWidth = 15;
         ctx.strokeRect(40, 40, width-80, height-80);
@@ -438,16 +445,13 @@
         ctx.lineWidth = 5;
         ctx.strokeRect(60, 60, width-120, height-120);
 
-        // 3. 文字内容
-        // 标题
         ctx.font = 'bold 80px "Cinzel", "Times New Roman"';
-        ctx.fillStyle = '#3e2723'; // 深棕色字体
+        ctx.fillStyle = '#3e2723'; 
         ctx.textAlign = 'center';
         ctx.fillText(CONFIG.letter.title, width/2, 200);
 
-        // 正文设置
         const fontSize = 50;
-        ctx.font = `${fontSize}px "Times New Roman", "SimSun", serif`; // 英文用Times，中文用宋体
+        ctx.font = `${fontSize}px "Times New Roman", "SimSun", serif`; 
         ctx.fillStyle = '#000000';
         ctx.textAlign = 'left';
 
@@ -458,10 +462,8 @@
         const maxWidth = width - margin * 2;
 
         lines.forEach(line => {
-            if(line.trim() === '') { y += lineHeight/2; return; } // 空行
-
-            // 简单的自动换行逻辑
-            let words = line.split(''); // 按字符拆分以支持中文换行
+            if(line.trim() === '') { y += lineHeight/2; return; }
+            let words = line.split(''); 
             let currentLine = '';
             for(let i = 0; i < words.length; i++) {
                 let testLine = currentLine + words[i];
@@ -478,28 +480,22 @@
             y += lineHeight;
         });
 
-        // 创建纹理和网格
         const texture = new THREE.CanvasTexture(canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
 
-        // 🌟 修改：尺寸加大 (原10,14 -> 16, 22.6)
         const geometry = new THREE.PlaneGeometry(16, 22.6);
-
-        // 🌟 修改：材质设置 depthTest: false 以保证在最上层
         const material = new THREE.MeshBasicMaterial({
             map: texture,
             transparent: true,
             side: THREE.DoubleSide,
-            depthTest: false, // 关键：关闭深度测试，使其绘制在所有物体上方
+            depthTest: false,
             depthWrite: false
         });
 
         letterMesh = new THREE.Mesh(geometry, material);
         letterMesh.position.set(0, 0, 0);
-        letterMesh.scale.set(0, 0, 0); // 初始隐藏
+        letterMesh.scale.set(0, 0, 0); 
         letterMesh.visible = false;
-
-        // 🌟 修改：设置渲染顺序为非常大的值，确保最后绘制
         letterMesh.renderOrder = 9999;
 
         scene.add(letterMesh);
@@ -552,7 +548,7 @@
                 this.mesh.rotation.z = THREE.MathUtils.lerp(this.mesh.rotation.z, 0, dt);
                 rotateActive = false;
             }
-            else if (mode === 'SCATTER' || mode === 'LETTER') { // LETTER 模式下粒子也散开
+            else if (mode === 'SCATTER' || mode === 'LETTER') {
                 target = this.posScatter;
                 if(this.type === 'PHOTO') targetScale = this.baseScale * 1.2;
             }
@@ -685,9 +681,7 @@
 
     function createParticles() {
         const sphereGeo = new THREE.SphereGeometry(0.5, 64, 64);
-
-        // 🌟 修改：礼物盒几何体 (BoxGeometry)
-        const giftGeo = new THREE.BoxGeometry(1, 1, 1); // 基础大小1，后续scale缩放
+        const giftGeo = new THREE.BoxGeometry(1, 1, 1); 
 
         const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0, -0.5, 0), new THREE.Vector3(0, 0.3, 0), new THREE.Vector3(0.1, 0.5, 0), new THREE.Vector3(0.3, 0.4, 0)]);
         const caneGeo = new THREE.TubeGeometry(curve, 32, 0.08, 16, false);
@@ -699,13 +693,12 @@
             metalness: 1.0, roughness: 0.1, envMapIntensity: 3.5, emissive: 0x442200, emissiveIntensity: 0.6, clearcoat: 1.0
         });
 
-        // 🌟 修改：高级感礼物盒材质 (物理材质, 绿色包装, 红色丝带贴图)
         const giftMat = new THREE.MeshPhysicalMaterial({
             map: giftTexture,
             color: 0xffffff,
             metalness: 0.2,
             roughness: 0.3,
-            clearcoat: 0.8, // 清漆层增加高级感
+            clearcoat: 0.8, 
             clearcoatRoughness: 0.1,
             emissive: 0x001100,
             emissiveIntensity: 0.2
@@ -721,11 +714,9 @@
         for (let i = 0; i < CONFIG.particles.count; i++) {
             const rand = Math.random();
             let mesh, type;
-            // 🌟 修改：约25%的概率生成礼物盒 (绿色包装红色丝带)
             if (rand < 0.25) {
                 mesh = new THREE.Mesh(giftGeo, giftMat);
                 type = 'GIFT';
-                // 尺寸比相框(相框约0.8-1.5)稍小，设定为 0.7 - 0.9
                 const s = 0.7 + Math.random() * 0.2;
                 mesh.scale.set(s, s, s);
             }
@@ -743,7 +734,6 @@
             mainGroup.add(mesh); particleSystem.push(new Particle(mesh, type, false));
         }
 
-        // 🌟 修改：立体五角星作为树顶
         const shape = new THREE.Shape();
         const numPoints = 5;
         const outerRadius = 1.2;
@@ -759,7 +749,6 @@
         shape.closePath();
         const extrudeSettings = { depth: 0.3, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 0.1, bevelThickness: 0.1 };
         const starGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        // 旋转五角星使其立起来
         starGeo.rotateZ(Math.PI/2);
         starGeo.rotateY(Math.PI/2);
 
@@ -789,6 +778,8 @@
                 loader.load(path, (texture) => {
                     texture.colorSpace = THREE.SRGBColorSpace;
                     addPhotoToScene(texture);
+                }, undefined, (err) => {
+                    console.log("Image skip: " + path);
                 });
             });
         }
@@ -812,7 +803,6 @@
         const frame = new THREE.Mesh(frameGeo, frameMat);
 
         const group = new THREE.Group(); group.add(frame); group.add(photo);
-        // 相框尺寸约为 0.8 倍 (即 1.5 * 0.8 ≈ 1.2)
         const s = 0.8; group.scale.set(s,s,s);
         photoMeshGroup.add(group); particleSystem.push(new Particle(group, 'PHOTO', false));
     }
@@ -831,36 +821,39 @@
         const audio = STATE.music.audioElement;
         audio.volume = STATE.music.volume;
 
+        // Safari 必须在用户交互（点击）回调中触发 video.play()
+        const userInteractionHandler = () => {
+            if (audio.src && !STATE.music.isPlaying) {
+                audio.play().catch(() => {});
+                STATE.music.isPlaying = true;
+                document.getElementById('play-pause-btn').textContent = '⏸️';
+            }
+            if (video && video.srcObject && video.paused) {
+                video.play().catch(e => console.log("Video auto-play blocked, retrying on interaction"));
+            }
+        };
+
+        document.body.addEventListener('click', userInteractionHandler, { once: true });
+        document.body.addEventListener('touchstart', userInteractionHandler, { once: true });
+
         if (ASSETS.music && ASSETS.music !== "") {
             audio.src = ASSETS.music;
-            const playPromise = audio.play();
-            if (playPromise !== undefined) {
-                playPromise.then(_ => {
-                    STATE.music.isPlaying = true;
-                    document.getElementById('play-pause-btn').textContent = '⏸️';
-                }).catch(error => {
-                    console.log("浏览器阻止自动播放，等待交互...");
-                    const startAudio = () => {
-                        audio.play();
-                        STATE.music.isPlaying = true;
-                        document.getElementById('play-pause-btn').textContent = '⏸️';
-                        document.body.removeEventListener('click', startAudio);
-                    };
-                    document.body.addEventListener('click', startAudio);
-                });
-            }
         }
 
         const playPauseBtn = document.getElementById('play-pause-btn');
-        playPauseBtn.addEventListener('click', () => {
-            if (!audio.src) { if (!ASSETS.music) alert("请先在代码中配置 music.mp3 或上传音乐"); return; }
+        playPauseBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (video && video.srcObject && video.paused) video.play();
+            
+            if (!audio.src) { if (!ASSETS.music) alert("请配置 music.mp3"); return; }
             if (STATE.music.isPlaying) { audio.pause(); playPauseBtn.textContent = '▶️'; }
             else { audio.play(); playPauseBtn.textContent = '⏸️'; }
             STATE.music.isPlaying = !STATE.music.isPlaying;
         });
 
         const restartBtn = document.getElementById('restart-btn');
-        restartBtn.addEventListener('click', () => {
+        restartBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             if (!audio.src) return;
             audio.currentTime = 0; if (STATE.music.isPlaying) audio.play();
         });
@@ -873,12 +866,14 @@
              STATE.music.volume = newVolume; audio.volume = newVolume;
              volumeSlider.style.width = `${newVolume * 100}%`; volumeHandle.style.left = `${newVolume * 100}%`;
         };
-        volumeControl.addEventListener('click', (e) => updateVol(e.clientX, volumeControl.getBoundingClientRect()));
+        const handleInput = (clientX) => {
+             const rect = volumeControl.getBoundingClientRect();
+             updateVol(clientX, rect);
+        }
 
-        let isDragging = false;
-        volumeHandle.addEventListener('mousedown', () => isDragging = true);
-        document.addEventListener('mouseup', () => isDragging = false);
-        document.addEventListener('mousemove', (e) => { if(isDragging) updateVol(e.clientX, volumeControl.getBoundingClientRect()); });
+        volumeControl.addEventListener('click', (e) => handleInput(e.clientX));
+        volumeControl.addEventListener('touchstart', (e) => handleInput(e.touches[0].clientX));
+        volumeControl.addEventListener('touchmove', (e) => handleInput(e.touches[0].clientX));
 
         document.getElementById('music-input').addEventListener('change', (e) => {
             const file = e.target.files[0]; if (!file) return;
@@ -892,24 +887,71 @@
         webcamCanvas = document.getElementById('webcam-preview');
         webcamCtx = webcamCanvas.getContext('2d');
         webcamCanvas.width = 160; webcamCanvas.height = 120;
+        
         const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
+        
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const useGPU = !isIOS && !isSafari;
+
+        console.log(`MediaPipe: Using ${useGPU ? 'GPU' : 'CPU'} backend.`);
+
         handLandmarker = await HandLandmarker.createFromOptions(vision, {
-            baseOptions: { modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`, delegate: "GPU" },
-            runningMode: "VIDEO", numHands: 1
+            baseOptions: { 
+                modelAssetPath: `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task`,
+                delegate: useGPU ? "GPU" : "CPU"
+            },
+            runningMode: "VIDEO", 
+            numHands: 1
         });
+
         if (navigator.mediaDevices?.getUserMedia) {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream; video.addEventListener("loadeddata", predictWebcam);
+            const constraints = {
+                audio: false, 
+                video: {
+                    facingMode: "user",
+                    width: { ideal: 320 }, 
+                    height: { ideal: 240 }
+                }
+            };
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play().then(() => {
+                        console.log("Webcam playing");
+                        predictWebcam();
+                    }).catch(e => {
+                        console.warn("Webcam auto-play failed, waiting for interaction", e);
+                    });
+                };
+            } catch (err) {
+                console.error("Webcam access denied:", err);
+                alert("请允许摄像头权限以体验手势控制 (Please allow camera access)");
+            }
         }
     }
 
     let lastVideoTime = -1;
     async function predictWebcam() {
+        if (video.paused || video.ended) {
+            requestAnimationFrame(predictWebcam);
+            return;
+        }
+
         if (video.currentTime !== lastVideoTime) {
             lastVideoTime = video.currentTime;
             if (handLandmarker) {
-                const result = handLandmarker.detectForVideo(video, performance.now());
-                processGestures(result);
+                try {
+                    if (video.videoWidth > 0 && webcamCanvas.width !== video.videoWidth) {
+                         webcamCanvas.width = video.videoWidth;
+                         webcamCanvas.height = video.videoHeight;
+                    }
+                    webcamCtx.drawImage(video, 0, 0, webcamCanvas.width, webcamCanvas.height);
+                    const result = handLandmarker.detectForVideo(webcamCanvas, performance.now());
+                    processGestures(result);
+                } catch (e) { }
             }
         }
         requestAnimationFrame(predictWebcam);
@@ -930,7 +972,6 @@
 
             const pinchDist = Math.hypot(lm[8].x - lm[4].x, lm[8].y - lm[4].y);
 
-            // 1. 抓取照片 (捏合)
             if (pinchDist < 0.08) {
                 if (STATE.mode !== 'FOCUS') {
                     STATE.mode = 'FOCUS';
@@ -938,22 +979,18 @@
                     if(photos.length) STATE.focusTarget = photos[Math.floor(Math.random()*photos.length)].mesh;
                 }
             }
-            // 2. 💌 比“1” (食指伸直，其他弯曲) -> 打开信件
             else if (indexOpen && !middleOpen && !ringOpen && !pinkyOpen) {
                 STATE.mode = 'LETTER';
                 STATE.focusTarget = null;
             }
-            // 3. ✌️ 比耶 -> 文字 + 烟花
             else if (indexOpen && middleOpen && !ringOpen && !pinkyOpen) {
                 STATE.mode = 'TEXT';
                 STATE.focusTarget = null;
             }
-            // 4. 五指张开 -> 散开
             else if (indexOpen && middleOpen && ringOpen && pinkyOpen) {
                 STATE.mode = 'SCATTER';
                 STATE.focusTarget = null;
             }
-            // 5. 握拳 -> 树
             else if (!indexOpen && !middleOpen && !ringOpen && !pinkyOpen) {
                 STATE.mode = 'TREE';
                 STATE.focusTarget = null;
@@ -978,10 +1015,11 @@
 
     function animate() {
         requestAnimationFrame(animate);
+        if(!running) return;
+
         const dt = clock.getDelta();
 
         if (STATE.hand.detected) {
-            // 在散开、文字、信件模式下允许旋转视角
             if (STATE.mode === 'SCATTER' || STATE.mode === 'TEXT' || STATE.mode === 'LETTER') {
                 const targetRotY = STATE.hand.x * Math.PI * 0.9;
                 const targetRotX = STATE.hand.y * Math.PI * 0.25;
@@ -1000,14 +1038,11 @@
 
         particleSystem.forEach(p => p.update(dt, STATE.mode, STATE.focusTarget));
 
-        // 信件动画逻辑
         if (letterMesh) {
             if (STATE.mode === 'LETTER') {
                 letterMesh.visible = true;
-                // 缓慢变大并旋转出现
                 letterMesh.scale.lerp(new THREE.Vector3(1, 1, 1), 3.0 * dt);
-                letterMesh.rotation.y = Math.sin(clock.elapsedTime * 0.5) * 0.1; // 微微晃动
-                // 确保信件始终面向摄像机并跟随主组旋转（抵消）
+                letterMesh.rotation.y = Math.sin(clock.elapsedTime * 0.5) * 0.1; 
                 letterMesh.lookAt(camera.position);
             } else {
                 letterMesh.scale.lerp(new THREE.Vector3(0, 0, 0), 5.0 * dt);
